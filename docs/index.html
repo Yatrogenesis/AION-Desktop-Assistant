@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AION Desktop Assistant - AI-Powered Accessibility for Windows</title>
+    <meta name="description" content="AION Desktop Assistant - Empowering independence through AI-powered voice control, screen reading, and automation for disabled users">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 40px 0;
+            text-align: center;
+            animation: fadeInDown 1s ease;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            opacity: 0.95;
+            margin-bottom: 40px;
+        }
+
+        .hero {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px;
+            margin: 40px 0;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .download-section {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .download-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .download-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #06ffa5 0%, #00c9ff 100%);
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,201,255,0.4);
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,201,255,0.6);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .version-info {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #06ffa5;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            background: rgba(0,0,0,0.3);
+            margin-top: 80px;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .github-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .hero {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AION Desktop Assistant</h1>
+            <p class="tagline">AI-Powered Windows Accessibility Solution</p>
+            <p>Empowering Independence Through Technology</p>
+        </header>
+
+        <div class="hero">
+            <h2 style="text-align: center; margin-bottom: 30px;">Complete Hands-Free Computer Control</h2>
+            <p style="font-size: 1.2rem; text-align: center; line-height: 1.8;">
+                AION Desktop Assistant transforms Windows accessibility with advanced AI technology,
+                enabling users with physical disabilities to control their computers entirely through voice commands.
+                Designed especially for quadriplegics and users with severe mobility limitations.
+            </p>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">25+</div>
+                <div class="stat-label">Voice Commands</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Hands-Free</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">8</div>
+                <div class="stat-label">Core Services</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Platforms</div>
+            </div>
+        </div>
+
+        <section class="download-section">
+            <h2 style="font-size: 2.5rem; margin-bottom: 30px;">Download Latest Version</h2>
+
+            <div class="version-info">
+                <h3>Version 1.0.0 - "Independence"</h3>
+                <p>Released: January 2, 2025</p>
+            </div>
+
+            <div class="download-grid">
+                <div class="download-card">
+                    <div class="feature-icon">💻</div>
+                    <h3>Windows x64</h3>
+                    <p>For 64-bit Windows 10/11</p>
+                    <a href="https://github.com/Yatrogenesis/AION-Desktop-Assistant/releases/download/v1.0.0/AION-Desktop-Assistant-Win-x64.zip" class="download-btn">
+                        Download x64
+                    </a>
+                </div>
+
+                <div class="download-card">
+                    <div class="feature-icon">🖥️</div>
+                    <h3>Windows x86</h3>
+                    <p>For 32-bit Windows systems</p>
+                    <a href="https://github.com/Yatrogenesis/AION-Desktop-Assistant/releases/download/v1.0.0/AION-Desktop-Assistant-Win-x86.zip" class="download-btn">
+                        Download x86
+                    </a>
+                </div>
+
+                <div class="download-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Windows ARM64</h3>
+                    <p>For ARM-based Windows</p>
+                    <a href="https://github.com/Yatrogenesis/AION-Desktop-Assistant/releases/download/v1.0.0/AION-Desktop-Assistant-Win-ARM64.zip" class="download-btn">
+                        Download ARM64
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎤</div>
+                <h3 class="feature-title">Voice Control</h3>
+                <p>Advanced speech recognition with natural language processing. Control every aspect of your computer with voice commands.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👁️</div>
+                <h3 class="feature-title">Screen Reading</h3>
+                <p>Intelligent OCR technology reads any text on your screen. Perfect for users with visual impairments.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🖱️</div>
+                <h3 class="feature-title">Mouse & Keyboard</h3>
+                <p>Precise automation of mouse movements and keyboard input. Click, type, and navigate with voice commands.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🪟</div>
+                <h3 class="feature-title">Window Management</h3>
+                <p>Switch between applications, manage windows, and control your desktop environment entirely hands-free.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">♿</div>
+                <h3 class="feature-title">Accessibility First</h3>
+                <p>Designed from the ground up for users with disabilities. High contrast UI, voice feedback, and barrier-free interaction.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 class="feature-title">Self-Contained</h3>
+                <p>No additional dependencies required. Everything you need is included in a single executable file.</p>
+            </div>
+        </section>
+
+        <section style="text-align: center; margin: 60px 0;">
+            <h2 style="font-size: 2rem; margin-bottom: 30px;">Voice Commands</h2>
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; max-width: 800px; margin: 0 auto;">
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Sample commands you can use:</p>
+                <ul style="list-style: none; font-size: 1.1rem; line-height: 2;">
+                    <li>"Read screen" - Read all visible text</li>
+                    <li>"Click [element]" - Click on specific UI elements</li>
+                    <li>"Switch to [window]" - Change active window</li>
+                    <li>"Type [text]" - Input text at cursor position</li>
+                    <li>"Take screenshot" - Capture screen image</li>
+                    <li>"Help" - Get available commands</li>
+                </ul>
+            </div>
+        </section>
+
+        <section style="text-align: center; margin: 60px 0;">
+            <h2 style="font-size: 2rem; margin-bottom: 30px;">System Requirements</h2>
+            <div style="background: rgba(0,0,0,0.3); padding: 30px; border-radius: 15px; max-width: 600px; margin: 0 auto;">
+                <ul style="list-style: none; font-size: 1.1rem; line-height: 2; text-align: left;">
+                    <li>✅ Windows 10/11 (64-bit, 32-bit, or ARM)</li>
+                    <li>✅ .NET 8.0 Runtime (included)</li>
+                    <li>✅ Microphone for voice control</li>
+                    <li>✅ 100MB free disk space</li>
+                    <li>✅ Administrator privileges</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer>
+            <a href="https://github.com/Yatrogenesis/AION-Desktop-Assistant" class="github-link">
+                <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                View on GitHub
+            </a>
+            <a href="https://github.com/Yatrogenesis/AION-Desktop-Assistant/releases" class="github-link">
+                📦 All Releases
+            </a>
+            <a href="https://github.com/Yatrogenesis/AION-Desktop-Assistant/issues" class="github-link">
+                🐛 Report Issues
+            </a>
+
+            <p style="margin-top: 30px; opacity: 0.9;">
+                Copyright © 2025 AION Technologies. All rights reserved.
+            </p>
+            <p style="margin-top: 10px; opacity: 0.7;">
+                Empowering Independence Through Technology 🌟
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

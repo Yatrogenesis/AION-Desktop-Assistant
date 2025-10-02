@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "releaseDate": "2025-01-02",
+  "codeName": "Independence",
+  "buildNumber": 100,
+  "platforms": {
+    "windows": {
+      "x64": {
+        "supported": true,
+        "minVersion": "10.0.19041.0",
+        "runtime": ".NET 8.0",
+        "architecture": "AMD64"
+      },
+      "x86": {
+        "supported": true,
+        "minVersion": "10.0.19041.0",
+        "runtime": ".NET 8.0",
+        "architecture": "x86"
+      },
+      "arm64": {
+        "supported": true,
+        "minVersion": "10.0.19041.0",
+        "runtime": ".NET 8.0",
+        "architecture": "ARM64"
+      }
+    }
+  },
+  "features": {
+    "voiceControl": true,
+    "screenReading": true,
+    "ocr": true,
+    "mouseAutomation": true,
+    "keyboardAutomation": true,
+    "windowManagement": true,
+    "multiMonitorSupport": true,
+    "accessibility": true
+  },
+  "changelog": {
+    "1.0.0": {
+      "date": "2025-01-02",
+      "changes": [
+        "Initial release",
+        "Complete voice control system",
+        "Advanced OCR with OpenCV preprocessing",
+        "Mouse and keyboard automation",
+        "Window management features",
+        "Accessibility-first design for disabled users",
+        "Self-contained executable with all dependencies"
+      ]
+    }
+  },
+  "dependencies": {
+    "dotnet": "8.0.0",
+    "tesseract": "5.2.0",
+    "opencv": "4.8.0",
+    "naudio": "2.2.1"
+  },
+  "updateChannel": {
+    "stable": {
+      "url": "https://github.com/Yatrogenesis/AION-Desktop-Assistant/releases/latest",
+      "autoUpdate": false
+    },
+    "beta": {
+      "url": "https://github.com/Yatrogenesis/AION-Desktop-Assistant/releases",
+      "autoUpdate": false
+    }
+  }
+}
