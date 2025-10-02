@@ -1,0 +1,86 @@
+<Window x:Class="AionDesktopAssistant.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AION Desktop Assistant - Accessibility Helper"
+        Height="600" Width="800"
+        WindowState="Normal"
+        Topmost="True">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#007ACC" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="🤖 AION Desktop Assistant" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                <TextBlock x:Name="StatusText" Text="Ready" FontSize="14" Foreground="#90EE90" Margin="20,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Controls Panel -->
+            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                <TextBlock Text="Voice Commands" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                <Button x:Name="StartListeningBtn" Content="🎤 Start Voice Control" Click="StartListening_Click"/>
+                <Button x:Name="StopListeningBtn" Content="⏹️ Stop Voice Control" Click="StopListening_Click" IsEnabled="False"/>
+
+                <Separator Margin="0,20"/>
+
+                <TextBlock Text="Screen Reading" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                <Button x:Name="ReadScreenBtn" Content="👁️ Read Current Screen" Click="ReadScreen_Click"/>
+                <Button x:Name="CaptureScreenBtn" Content="📸 Capture Screenshot" Click="CaptureScreen_Click"/>
+
+                <Separator Margin="0,20"/>
+
+                <TextBlock Text="Mouse Control" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox x:Name="MouseXText" Width="80" Text="100"/>
+                    <TextBox x:Name="MouseYText" Width="80" Text="100"/>
+                    <Button x:Name="MoveMouseBtn" Content="Move" Click="MoveMouse_Click"/>
+                </StackPanel>
+                <Button x:Name="ClickMouseBtn" Content="🖱️ Click at Cursor" Click="ClickMouse_Click"/>
+
+                <Separator Margin="0,20"/>
+
+                <TextBlock Text="Window Management" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                <Button x:Name="ListWindowsBtn" Content="📝 List All Windows" Click="ListWindows_Click"/>
+                <ComboBox x:Name="WindowsComboBox" Margin="5"/>
+                <Button x:Name="SwitchWindowBtn" Content="🔄 Switch to Window" Click="SwitchWindow_Click"/>
+            </StackPanel>
+
+            <!-- Output Panel -->
+            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                <TextBlock Text="Output & Feedback" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                <ScrollViewer Height="400" VerticalScrollBarVisibility="Auto">
+                    <TextBox x:Name="OutputTextBox"
+                             TextWrapping="Wrap"
+                             IsReadOnly="True"
+                             AcceptsReturn="True"
+                             Text="AION Desktop Assistant initialized.&#x0A;Ready to assist with accessibility tasks.&#x0A;&#x0A;Voice commands available:&#x0A;- 'Read screen'&#x0A;- 'Click [position]'&#x0A;- 'Type [text]'&#x0A;- 'Switch to [window name]'&#x0A;- 'Help me'"/>
+                </ScrollViewer>
+
+                <TextBlock Text="Voice Input" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
+                <TextBox x:Name="VoiceInputText" Height="60" TextWrapping="Wrap" IsReadOnly="True"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#2D2D2D" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="AION Technologies 2025 - Accessibility Assistant" Foreground="#CCCCCC"/>
+                <TextBlock x:Name="MicrophoneStatus" Text="🎤 Microphone: Ready" Foreground="#90EE90" Margin="20,0,0,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
