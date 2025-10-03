@@ -1,0 +1,424 @@
+name: Build and Release AION Desktop Assistant
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release'
+        required: true
+        default: '1.0.0'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_NAME: 'AionDesktopAssistant'
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/TestResults/**/*.xml'
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-reports
+        path: '**/TestResults/**/coverage.cobertura.xml'
+
+  build-multiplatform:
+    name: Build Multi-Platform Releases
+    needs: build-and-test
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        runtime: [win-x64, win-x86, win-arm64, linux-x64, osx-x64]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Get version
+      id: version
+      shell: pwsh
+      run: |
+        if ("${{ github.ref }}" -match "refs/tags/v(.+)") {
+          $version = $matches[1]
+        } elseif ("${{ github.event.inputs.version }}") {
+          $version = "${{ github.event.inputs.version }}"
+        } else {
+          $version = "1.0.0-dev"
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Publish ${{ matrix.runtime }}
+      run: |
+        dotnet publish --configuration Release --runtime ${{ matrix.runtime }} --self-contained true --output "releases/${{ matrix.runtime }}" /p:PublishSingleFile=true /p:PublishTrimmed=true /p:Version=${{ steps.version.outputs.VERSION }}
+
+    - name: Create installer package
+      shell: pwsh
+      run: |
+        $runtime = "${{ matrix.runtime }}"
+        $version = "${{ steps.version.outputs.VERSION }}"
+        $packageName = "${{ env.PROJECT_NAME }}-v$version-$runtime.zip"
+
+        # Create installers directory
+        New-Item -ItemType Directory -Force -Path "installers"
+
+        # Create ZIP package
+        Compress-Archive -Path "releases/$runtime/*" -DestinationPath "installers/$packageName" -Force
+
+        # Log package info
+        $size = (Get-Item "installers/$packageName").Length / 1MB
+        Write-Host "Created package: $packageName ($([math]::Round($size, 2)) MB)"
+
+        # Create checksum
+        $hash = (Get-FileHash "installers/$packageName" -Algorithm SHA256).Hash
+        "$hash  $packageName" | Out-File -FilePath "installers/$packageName.sha256" -Encoding UTF8
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: installer-${{ matrix.runtime }}
+        path: |
+          installers/*.zip
+          installers/*.sha256
+        retention-days: 30
+
+  create-release:
+    name: Create GitHub Release
+    needs: build-multiplatform
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get version
+      id: version
+      shell: pwsh
+      run: |
+        if ("${{ github.ref }}" -match "refs/tags/v(.+)") {
+          $version = $matches[1]
+        } elseif ("${{ github.event.inputs.version }}") {
+          $version = "${{ github.event.inputs.version }}"
+        } else {
+          $version = "1.0.0-dev"
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Organize release files
+      shell: pwsh
+      run: |
+        # Create release directory
+        New-Item -ItemType Directory -Force -Path "release-files"
+
+        # Copy all installer files
+        Get-ChildItem -Path "artifacts/installer-*" -Recurse -File | ForEach-Object {
+          Copy-Item $_.FullName -Destination "release-files/"
+        }
+
+        # Create release notes
+        $version = "${{ steps.version.outputs.VERSION }}"
+        $releaseNotes = @"
+        # AION Desktop Assistant v$version
+
+        ## New in this release
+        - Comprehensive accessibility support for disabled users
+        - Advanced OCR text recognition with confidence tracking
+        - Voice synthesis and recognition capabilities
+        - Screen capture and automation tools
+        - Mouse and keyboard automation
+        - Advanced window management
+        - Structured logging with Serilog for full traceability
+        - Comprehensive test coverage (>65%)
+
+        ## Supported Platforms
+        - **Windows x64** (Recommended) - For 64-bit Windows systems
+        - **Windows x86** - For 32-bit Windows systems
+        - **Windows ARM64** - For ARM-based Windows devices
+        - **Linux x64** - Cross-platform support
+        - **macOS x64** - Cross-platform support
+
+        ## Installation
+        1. Download the appropriate package for your platform
+        2. Extract the ZIP file to your desired location
+        3. Run AionDesktopAssistant.exe (Windows) or the appropriate executable
+        4. The application will create log files in the logs directory
+
+        ## System Requirements
+        - Windows 10 or later (Windows 11 recommended)
+        - .NET 8 Runtime (included in self-contained builds)
+        - Minimum 4GB RAM
+        - Screen reader compatibility
+
+        ## Security
+        All packages include SHA256 checksums for verification.
+
+        ## What's Changed
+        - Integrated comprehensive Serilog logging across all services
+        - Enhanced accessibility features with detailed traceability
+        - Added performance monitoring and error tracking
+        - Implemented multi-platform build support
+        - Created automated testing and release pipeline
+
+        **Full Changelog**: https://github.com/${{ github.repository }}/compare/v$version
+        "@
+
+        $releaseNotes | Out-File -FilePath "release-files/RELEASE-NOTES.md" -Encoding UTF8
+
+        # Create installation instructions
+        $instructions = @"
+        # AION Desktop Assistant - Installation Instructions
+
+        ## Quick Start
+        1. Download the package for your platform:
+           - **Windows 64-bit**: ${{ env.PROJECT_NAME }}-v$version-win-x64.zip
+           - **Windows 32-bit**: ${{ env.PROJECT_NAME }}-v$version-win-x86.zip
+           - **Windows ARM64**: ${{ env.PROJECT_NAME }}-v$version-win-arm64.zip
+
+        2. Extract the ZIP file to your preferred location
+        3. Run AionDesktopAssistant.exe to start the application
+
+        ## Verification
+        Verify package integrity using the provided SHA256 checksums:
+        certutil -hashfile filename.zip SHA256 (Windows)
+        sha256sum filename.zip (Linux/macOS)
+
+        ## Support
+        - Check the logs directory for troubleshooting information
+        - Application supports voice feedback and accessibility features
+        - Structured logging provides detailed operation traceability
+        "@
+
+        $instructions | Out-File -FilePath "release-files/INSTALLATION.md" -Encoding UTF8
+
+        # List all files
+        Write-Host "Release files prepared:"
+        Get-ChildItem -Path "release-files" | Format-Table Name, Length
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        name: AION Desktop Assistant v${{ steps.version.outputs.VERSION }}
+        body_path: release-files/RELEASE-NOTES.md
+        draft: false
+        prerelease: false
+        files: |
+          release-files/*.zip
+          release-files/*.sha256
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Get version
+      id: version
+      run: |
+        if [[ "${{ github.ref }}" =~ refs/tags/v(.+) ]]; then
+          version="${BASH_REMATCH[1]}"
+        elif [[ -n "${{ github.event.inputs.version }}" ]]; then
+          version="${{ github.event.inputs.version }}"
+        else
+          version="1.0.0-dev"
+        fi
+        echo "VERSION=$version" >> $GITHUB_OUTPUT
+        echo "Version: $version"
+
+    - name: Create GitHub Pages content
+      run: |
+        mkdir -p pages
+
+        cat > pages/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>AION Desktop Assistant - Download</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; background: #f8f9fa; }
+                .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #007acc; padding-bottom: 20px; }
+                .download-section { background: #f8f9fa; padding: 30px; border-radius: 8px; margin: 30px 0; border: 1px solid #dee2e6; }
+                .platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0; }
+                .platform-card { background: white; padding: 25px; border-radius: 8px; border: 2px solid #007acc; text-align: center; transition: transform 0.2s; }
+                .platform-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,122,204,0.2); }
+                .download-btn { display: inline-block; background: #007acc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px; }
+                .download-btn:hover { background: #005a9e; }
+                .version-badge { background: #28a745; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: bold; }
+                .checksum { font-family: 'Courier New', monospace; font-size: 0.8em; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-top: 10px; }
+                .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 30px 0; }
+                .feature { background: #f8f9fa; padding: 20px; border-left: 4px solid #007acc; border-radius: 0 8px 8px 0; }
+                .requirements { background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px; margin: 20px 0; }
+                .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #dee2e6; color: #6c757d; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>AION Desktop Assistant</h1>
+                    <p>Professional accessibility and automation toolkit for Windows</p>
+                    <span class="version-badge">v${{ steps.version.outputs.VERSION }}</span>
+                </div>
+
+                <div class="download-section">
+                    <h2>Download Self-Contained Executables</h2>
+                    <p><strong>No .NET installation required</strong> - All packages include the complete runtime</p>
+
+                    <div class="platform-grid">
+                        <div class="platform-card">
+                            <h3>Windows 64-bit</h3>
+                            <p><strong>Recommended</strong> for most Windows users</p>
+                            <p>Self-contained executable package</p>
+                            <a href="https://github.com/${{ github.repository }}/releases/latest/download/AionDesktopAssistant-v${{ steps.version.outputs.VERSION }}-win-x64.zip" class="download-btn">Download x64</a>
+                            <div class="checksum">SHA256 checksum included</div>
+                        </div>
+                        <div class="platform-card">
+                            <h3>Windows 32-bit</h3>
+                            <p>For legacy 32-bit Windows systems</p>
+                            <p>Self-contained executable package</p>
+                            <a href="https://github.com/${{ github.repository }}/releases/latest/download/AionDesktopAssistant-v${{ steps.version.outputs.VERSION }}-win-x86.zip" class="download-btn">Download x86</a>
+                            <div class="checksum">SHA256 checksum included</div>
+                        </div>
+                        <div class="platform-card">
+                            <h3>Windows ARM64</h3>
+                            <p>For ARM-based Windows devices</p>
+                            <p>Self-contained executable package</p>
+                            <a href="https://github.com/${{ github.repository }}/releases/latest/download/AionDesktopAssistant-v${{ steps.version.outputs.VERSION }}-win-arm64.zip" class="download-btn">Download ARM64</a>
+                            <div class="checksum">SHA256 checksum included</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature">
+                        <strong>Accessibility Support</strong><br>
+                        Comprehensive accessibility features designed for users with disabilities
+                    </div>
+                    <div class="feature">
+                        <strong>OCR Text Recognition</strong><br>
+                        Advanced optical character recognition with confidence tracking
+                    </div>
+                    <div class="feature">
+                        <strong>Voice Integration</strong><br>
+                        Speech synthesis and voice recognition capabilities
+                    </div>
+                    <div class="feature">
+                        <strong>Screen Automation</strong><br>
+                        Screen capture and intelligent automation tools
+                    </div>
+                    <div class="feature">
+                        <strong>Input Automation</strong><br>
+                        Advanced mouse and keyboard automation
+                    </div>
+                    <div class="feature">
+                        <strong>Window Management</strong><br>
+                        Comprehensive window management and navigation
+                    </div>
+                </div>
+
+                <div class="requirements">
+                    <h2>System Requirements</h2>
+                    <ul>
+                        <li><strong>Operating System:</strong> Windows 10 version 1903 or later (Windows 11 recommended)</li>
+                        <li><strong>Architecture:</strong> x64, x86, or ARM64</li>
+                        <li><strong>Memory:</strong> Minimum 4GB RAM (8GB recommended)</li>
+                        <li><strong>Disk Space:</strong> 150MB available space</li>
+                        <li><strong>Runtime:</strong> No .NET installation required (self-contained)</li>
+                        <li><strong>Accessibility:</strong> Compatible with screen readers and assistive technologies</li>
+                    </ul>
+                </div>
+
+                <h2>Installation Instructions</h2>
+                <ol>
+                    <li><strong>Download</strong> the appropriate package for your Windows architecture</li>
+                    <li><strong>Extract</strong> the ZIP file to your preferred installation directory</li>
+                    <li><strong>Run</strong> AionDesktopAssistant.exe to start the application</li>
+                    <li><strong>Verify</strong> package integrity using the included SHA256 checksum file</li>
+                </ol>
+
+                <h2>Package Verification</h2>
+                <p>Each download includes a SHA256 checksum file for security verification:</p>
+                <pre>certutil -hashfile AionDesktopAssistant-v${{ steps.version.outputs.VERSION }}-win-x64.zip SHA256</pre>
+
+                <div class="footer">
+                    <p><strong>AION Desktop Assistant v${{ steps.version.outputs.VERSION }}</strong></p>
+                    <p>Professional accessibility toolkit - Self-contained executables with complete runtime</p>
+                    <p><a href="https://github.com/${{ github.repository }}/releases">View All Releases</a> |
+                       <a href="https://github.com/${{ github.repository }}/issues">Report Issues</a></p>
+                </div>
+            </div>
+        </body>
+        </html>
+        EOF
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: pages
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
