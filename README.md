@@ -1,49 +1,49 @@
-# 🤖 AION Desktop Assistant - Accessibility Helper
+# AION Desktop Assistant - Accessibility Helper
 
-## 🚀 AI-Powered Windows Desktop Accessibility Assistant
+## AI-Powered Windows Desktop Accessibility Assistant
 
-**AION Desktop Assistant** is a comprehensive Windows 10/11 accessibility application designed to help disabled users, including quadriplegics, interact with their computers through voice commands, screen reading, and intelligent automation.
+AION Desktop Assistant is a comprehensive Windows 10/11 accessibility application designed to assist users with disabilities, including quadriplegics and visually impaired individuals, in interacting with their computers through voice commands, screen reading, and intelligent automation.
 
-## ✨ Features
+## Features
 
-### 🎤 Voice Control
-- **Speech Recognition**: Advanced voice command processing
-- **Voice Synthesis**: Text-to-speech feedback and screen reading
-- **Natural Language Commands**: Intuitive voice control interface
-- **Continuous Listening**: Always-on voice activation
+### Voice Control
+- Speech Recognition: Advanced voice command processing
+- Voice Synthesis: Text-to-speech feedback and screen reading
+- Natural Language Commands: Intuitive voice control interface
+- Continuous Listening: Always-on voice activation
 
-### 👁️ Screen Reading & OCR
-- **Intelligent Screen Capture**: High-resolution screenshot capabilities
-- **Advanced OCR**: Text extraction from any screen content
-- **Screen Analysis**: Real-time screen content interpretation
-- **Visual Element Detection**: Automatic UI element identification
+### Screen Reading & OCR
+- Intelligent Screen Capture: High-resolution screenshot capabilities
+- Advanced OCR: Text extraction using Tesseract OCR 5.2.0
+- Screen Analysis: Real-time screen content interpretation
+- Visual Element Detection: Automatic UI element identification via Windows UI Automation
 
-### 🖱️ Mouse & Keyboard Automation
-- **Precise Mouse Control**: Click, drag, scroll automation
-- **Smart Keyboard Input**: Text typing and keyboard shortcuts
-- **Gesture Recognition**: Advanced interaction patterns
-- **Accessibility-First Design**: Optimized for users with mobility challenges
+### Mouse & Keyboard Automation
+- Precise Mouse Control: Click, drag, scroll automation
+- Smart Keyboard Input: Text typing and keyboard shortcuts
+- Gesture Recognition: Advanced interaction patterns
+- Accessibility-First Design: Optimized for users with mobility challenges
 
-### 🪟 Window Management
-- **Smart Window Switching**: Voice-activated window navigation
-- **Application Control**: Launch and manage applications
-- **Desktop Navigation**: Complete desktop environment control
-- **Multi-Monitor Support**: Full screen management across displays
+### Window Management
+- Window Switching: Voice-activated window navigation
+- Application Control: Launch and manage applications
+- Desktop Navigation: Desktop environment control
+- Multi-Monitor Support: Screen management across displays
 
-### ♿ Accessibility Features
-- **Barrier-Free Interface**: Designed for users with physical limitations
-- **Voice-First Operation**: Complete hands-free operation
-- **High Contrast UI**: Accessibility-optimized interface
-- **Customizable Commands**: Personalized voice command sets
+### Accessibility Features
+- Barrier-Free Interface: Designed for users with physical limitations
+- Voice-First Operation: Hands-free operation
+- High Contrast UI: Accessibility-optimized interface
+- Customizable Commands: Personalized voice command sets
 
-## 🏗️ Technical Architecture
+## Technical Architecture
 
 ### Core Technologies
-- **.NET 8.0 WPF**: Modern Windows application framework
-- **System.Speech**: Windows voice recognition and synthesis
-- **OpenCV**: Computer vision and image processing
-- **Tesseract OCR**: Advanced optical character recognition
-- **Windows UI Automation**: Native accessibility API integration
+- .NET 8.0 WPF: Windows application framework
+- System.Speech: Windows voice recognition and synthesis
+- OpenCV (OpenCvSharp4 4.8.0): Computer vision and image processing
+- Tesseract OCR 5.2.0: Optical character recognition
+- Windows UI Automation: Native accessibility API integration
 
 ### Services Architecture
 - `ScreenCaptureService`: Screen capture and image processing
@@ -55,45 +55,45 @@
 - `WindowManagementService`: Window and application management
 - `AccessibilityService`: Core accessibility coordination
 
-## 🎯 Voice Commands
+## Voice Commands
 
 ### Navigation Commands
-- **"Read screen"** - Read all visible text on screen
-- **"Click [element]"** - Click on specific UI elements
-- **"Switch to [window]"** - Change active window
-- **"Take screenshot"** - Capture and save screen image
+- "Read screen" - Read all visible text on screen
+- "Click [element]" - Click on specific UI elements
+- "Switch to [window]" - Change active window
+- "Take screenshot" - Capture and save screen image
 
 ### Text Input Commands
-- **"Type [text]"** - Input text at cursor position
-- **"Select all"** - Select all text
-- **"Copy"**, **"Paste"**, **"Cut"** - Clipboard operations
+- "Type [text]" - Input text at cursor position
+- "Select all" - Select all text
+- "Copy", "Paste", "Cut" - Clipboard operations
 
 ### System Commands
-- **"Help"** - Get available commands
-- **"Stop listening"** - Pause voice recognition
-- **"Start listening"** - Resume voice recognition
+- "Help" - Get available commands
+- "Stop listening" - Pause voice recognition
+- "Start listening" - Resume voice recognition
 
-## 💡 Use Cases
+## Use Cases
 
 ### For Quadriplegic Users
-- Complete hands-free computer operation
+- Hands-free computer operation
 - Voice-controlled web browsing and application use
-- Independent document creation and editing
+- Document creation and editing
 - Social media and communication access
 
 ### For Visually Impaired Users
-- Comprehensive screen reading capabilities
+- Screen reading capabilities
 - Voice-guided navigation
 - Text-to-speech document reading
-- Audio feedback for all operations
+- Audio feedback for operations
 
 ### For Motor Impairment Users
 - Reduced physical interaction requirements
-- Voice-activated precise cursor control
+- Voice-activated cursor control
 - Customizable automation workflows
 - Adaptive interface components
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Windows 10/11 (64-bit)
@@ -109,12 +109,12 @@
 5. Start voice control and begin using commands
 
 ### First-Time Setup
-1. **Voice Training**: Train the system to recognize your voice
-2. **Command Customization**: Configure personal voice commands
-3. **Accessibility Settings**: Adjust interface for your needs
-4. **Testing**: Verify all features work correctly
+1. Voice Training: Train the system to recognize your voice
+2. Command Customization: Configure personal voice commands
+3. Accessibility Settings: Adjust interface for your needs
+4. Testing: Verify all features work correctly
 
-## 🔧 Configuration
+## Configuration
 
 ### Voice Settings
 - Adjust microphone sensitivity
@@ -128,9 +128,31 @@
 - Customize screenshot intervals
 - Define application launch shortcuts
 
-## 🤝 Contributing
+## Accessibility Standards Compliance
 
-This project is open source and welcomes contributions from the accessibility community.
+This application follows established accessibility guidelines:
+- Designed according to Windows Accessibility Standards
+- Compatible with Windows built-in accessibility features
+- Supports NVDA and JAWS screen readers
+- Follows WCAG 2.1 AA guidelines where applicable
+
+## Testing & Quality Assurance
+
+### Supported Configurations
+Tested on:
+- Windows 10 21H2, 22H2 (x64)
+- Windows 11 21H2, 22H2, 23H2 (x64)
+- .NET 8.0.0 Runtime
+
+### Known Limitations
+- Requires administrative privileges for full automation features
+- OCR accuracy depends on screen resolution and text clarity
+- Voice recognition performance varies with microphone quality
+- Multi-language support currently limited to English
+
+## Contributing
+
+This project welcomes contributions from the accessibility community.
 
 ### Areas for Contribution
 - Enhanced voice command recognition
@@ -139,31 +161,39 @@ This project is open source and welcomes contributions from the accessibility co
 - New automation features
 - Accessibility testing and feedback
 
-## 📄 License
+## License
 
 Copyright 2025 AION Technologies. All rights reserved.
 
 This software is designed to improve accessibility and independence for users with disabilities.
 
-## 🆘 Support
+## Support
 
 For support, feature requests, or accessibility feedback:
 - Create an issue on GitHub
 - Contact: AION Technologies Support
-- Accessibility resources: [Accessibility Guidelines]
 
-## 🔄 Version History
+## Version History
 
 ### v1.0.0 (2025-01-02)
 - Initial release
-- Complete voice control system
-- Full screen reading capabilities
+- Voice control system
+- Screen reading capabilities
 - Mouse and keyboard automation
 - Window management features
 - Accessibility-first design
 
+## References
+
+### Accessibility Standards
+- Web Content Accessibility Guidelines (WCAG) 2.1: https://www.w3.org/TR/WCAG21/
+- Microsoft Accessibility Standards: https://www.microsoft.com/en-us/accessibility
+
+### Technical Documentation
+- .NET Accessibility: https://docs.microsoft.com/en-us/dotnet/desktop/wpf/advanced/accessibility
+- Windows UI Automation: https://docs.microsoft.com/en-us/windows/win32/winauto/entry-uiauto-win32
+- Tesseract OCR Documentation: https://tesseract-ocr.github.io/
+
 ---
 
-**Empowering Independence Through Technology** 🌟
-
-*AION Desktop Assistant - Making computers accessible to everyone*
+AION Desktop Assistant - Making computers accessible to everyone
