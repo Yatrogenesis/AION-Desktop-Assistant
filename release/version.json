@@ -1,0 +1,14 @@
+{ 
+  "version": "1.0.0", 
+  "releaseDate": "02/10/2025", 
+  "buildType": "source", 
+  "requiresDotNet": true, 
+  "dotNetVersion": "8.0", 
+  "platforms": ["win-x64", "win-x86", "win-arm64"], 
+  "features": { 
+    "voiceControl": true, 
+    "screenReading": true, 
+    "automation": true, 
+    "accessibility": true 
+  } 
+} 
