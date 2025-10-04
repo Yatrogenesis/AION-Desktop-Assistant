@@ -33,11 +33,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
   </ItemGroup>
 
-  <!-- Windows-specific packages for automation -->
-  <ItemGroup>
-    <PackageReference Include="System.Windows.Forms" Version="8.0.0" />
-    <PackageReference Include="Microsoft.WindowsDesktop.App" Version="8.0.0" />
-  </ItemGroup>
+  <!-- Windows Forms and WPF are included via UseWPF and UseWindowsForms properties -->
 
   <!-- Speech Recognition via System.Speech -->
   <!-- COM references removed for CI/CD compatibility -->
