@@ -18,8 +18,10 @@ namespace AionDesktopAssistant
         private readonly KeyboardAutomationService _keyboardAutomation;
         private readonly WindowManagementService _windowManagement;
         private readonly AccessibilityService _accessibility;
+        private readonly ClaudeCodeIntegrationService _claudeCode;
 
         private bool _isListening = false;
+        private bool _claudeIntegrationEnabled = false;
 
         public MainWindow(
             ScreenCaptureService screenCapture,
@@ -29,7 +31,8 @@ namespace AionDesktopAssistant
             MouseAutomationService mouseAutomation,
             KeyboardAutomationService keyboardAutomation,
             WindowManagementService windowManagement,
-            AccessibilityService accessibility)
+            AccessibilityService accessibility,
+            ClaudeCodeIntegrationService claudeCode)
         {
             InitializeComponent();
 
@@ -41,6 +44,7 @@ namespace AionDesktopAssistant
             _keyboardAutomation = keyboardAutomation;
             _windowManagement = windowManagement;
             _accessibility = accessibility;
+            _claudeCode = claudeCode;
 
             InitializeServices();
         }
@@ -51,6 +55,18 @@ namespace AionDesktopAssistant
             {
                 await _accessibility.InitializeAsync();
                 _voiceRecognition.CommandRecognized += OnVoiceCommandRecognized;
+
+                // 🤖 Initialize Claude Code integration
+                _claudeIntegrationEnabled = await _claudeCode.InitializeAsync();
+                if (_claudeIntegrationEnabled)
+                {
+                    AddToOutput("🤖 Claude Code integration enabled");
+                }
+                else
+                {
+                    AddToOutput("⚠️ Claude Code integration not available");
+                }
+
                 AddToOutput("✅ AION Desktop Assistant initialized successfully");
                 StatusText.Text = "Ready";
             }
@@ -81,6 +97,34 @@ namespace AionDesktopAssistant
         {
             command = command.ToLower().Trim();
 
+            // 🤖 Claude Code integration commands
+            if (_claudeIntegrationEnabled && command.StartsWith("ask claude"))
+            {
+                var question = command.Replace("ask claude", "").Trim();
+                await _claudeCode.AskClaudeAsync(question);
+                return;
+            }
+            else if (_claudeIntegrationEnabled && command.Contains("claude help"))
+            {
+                await _claudeCode.AskClaudeAsync("What can you help me with?");
+                return;
+            }
+            else if (_claudeIntegrationEnabled && command.Contains("analyze screen with claude"))
+            {
+                AddToOutput("🔍 Analyzing screen with Claude AI...");
+                var analysis = await _claudeCode.AnalyzeScreenWithClaudeAsync();
+                AddToOutput($"🤖 Claude: {analysis}");
+                return;
+            }
+            else if (_claudeIntegrationEnabled && command.Contains("claude accessibility"))
+            {
+                AddToOutput("♿ Getting accessibility suggestions from Claude...");
+                var suggestions = await _claudeCode.GetAccessibilitySuggestionsAsync();
+                AddToOutput($"🤖 Claude: {suggestions}");
+                return;
+            }
+
+            // 🎯 Standard commands
             if (command.Contains("read screen"))
             {
                 await ReadScreenContent();
@@ -99,7 +143,12 @@ namespace AionDesktopAssistant
             }
             else if (command.Contains("help"))
             {
-                await _voiceSynthesis.SpeakAsync("Available commands: read screen, click at position, type text, switch to window, help me");
+                var helpMessage = "Available commands: read screen, click at position, type text, switch to window";
+                if (_claudeIntegrationEnabled)
+                {
+                    helpMessage += ", ask claude [question], claude help, analyze screen with claude, claude accessibility";
+                }
+                await _voiceSynthesis.SpeakAsync(helpMessage);
             }
             else
             {

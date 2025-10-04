@@ -1,0 +1,72 @@
+# 🎨 EditorConfig - AION Desktop Assistant
+# https://editorconfig.org
+
+root = true
+
+# 🌐 All files
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# 📝 C# files
+[*.cs]
+indent_size = 4
+csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:warning
+
+# 🔧 Code quality
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# 📏 Formatting
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+
+# 🎯 Naming conventions
+dotnet_naming_rule.interface_should_be_begins_with_i.severity = warning
+dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
+dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
+
+dotnet_naming_rule.types_should_be_pascal_case.severity = warning
+dotnet_naming_rule.types_should_be_pascal_case.symbols = types
+dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.private_fields_should_be_begins_with_underscore.severity = warning
+dotnet_naming_rule.private_fields_should_be_begins_with_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_begins_with_underscore.style = begins_with_underscore
+
+# 📋 XML files
+[*.{xml,xaml,config,props,targets,nuspec,resx}]
+indent_size = 2
+
+# 🗂️ JSON files
+[*.{json,json5}]
+indent_size = 2
+
+# 📜 Markdown files
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# 🔨 Script files
+[*.{bat,cmd,ps1}]
+end_of_line = crlf
+indent_size = 2
+
+# 🔧 Config files
+[*.{yml,yaml}]
+indent_size = 2

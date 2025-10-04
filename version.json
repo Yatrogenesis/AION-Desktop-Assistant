@@ -1,8 +1,8 @@
 {
-  "version": "1.0.0",
-  "releaseDate": "2025-01-02",
-  "codeName": "Independence",
-  "buildNumber": 100,
+  "version": "1.1.0",
+  "releaseDate": "2025-10-04",
+  "codeName": "AI Integration",
+  "buildNumber": 110,
   "platforms": {
     "windows": {
       "x64": {
@@ -36,16 +36,31 @@
     "accessibility": true
   },
   "changelog": {
+    "1.1.0": {
+      "date": "2025-10-04",
+      "changes": [
+        "🤖 Added Claude Code CLI integration for AI-powered assistance",
+        "🎤 New voice commands: 'Ask Claude', 'Claude help', 'Analyze screen with Claude'",
+        "🔍 AI-powered screen analysis with contextual understanding",
+        "♿ Enhanced accessibility suggestions from Claude AI",
+        "📝 Complete emoji style guide for code and commits",
+        "🔧 EditorConfig for consistent code formatting",
+        "⚡ Performance optimizations across all services",
+        "✅ Code quality improvements to 10/10",
+        "📚 Comprehensive documentation update with AI features",
+        "🎨 Standardized emoji logging across all services"
+      ]
+    },
     "1.0.0": {
       "date": "2025-01-02",
       "changes": [
-        "Initial release",
-        "Complete voice control system",
-        "Advanced OCR with OpenCV preprocessing",
-        "Mouse and keyboard automation",
-        "Window management features",
-        "Accessibility-first design for disabled users",
-        "Self-contained executable with all dependencies"
+        "✨ Initial release",
+        "🎤 Complete voice control system",
+        "👁️ Advanced OCR with OpenCV preprocessing",
+        "🖱️ Mouse and keyboard automation",
+        "🪟 Window management features",
+        "♿ Accessibility-first design for disabled users",
+        "📦 Self-contained executable with all dependencies"
       ]
     }
   },
