@@ -66,8 +66,17 @@
                     <TextBox x:Name="OutputTextBox"
                              TextWrapping="Wrap"
                              IsReadOnly="True"
-                             AcceptsReturn="True"
-                             Text="AION Desktop Assistant initialized.&#x0A;Ready to assist with accessibility tasks.&#x0A;&#x0A;Voice commands available:&#x0A;- 'Read screen'&#x0A;- 'Click [position]'&#x0A;- 'Type [text]'&#x0A;- 'Switch to [window name]'&#x0A;- 'Help me'"/>
+                             AcceptsReturn="True">
+                        <TextBox.Text>AION Desktop Assistant initialized.
+Ready to assist with accessibility tasks.
+
+Voice commands available:
+- 'Read screen'
+- 'Click [position]'
+- 'Type [text]'
+- 'Switch to [window name]'
+- 'Help me'</TextBox.Text>
+                    </TextBox>
                 </ScrollViewer>
 
                 <TextBlock Text="Voice Input" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
