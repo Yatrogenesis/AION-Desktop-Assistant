@@ -121,6 +121,21 @@ namespace AionDesktopAssistant
                 return new ClaudeCodeIntegrationService(voiceRecognition, voiceSynthesis, screenCapture, ocr);
             });
 
+            services.AddSingleton(serviceProvider =>
+            {
+                Log.Information("🔄 Initializing AionRemoteControlService");
+                var screenCapture = serviceProvider.GetRequiredService<ScreenCaptureService>();
+                var ocr = serviceProvider.GetRequiredService<OcrService>();
+                var voiceRecognition = serviceProvider.GetRequiredService<VoiceRecognitionService>();
+                var voiceSynthesis = serviceProvider.GetRequiredService<VoiceSynthesisService>();
+                var mouseAutomation = serviceProvider.GetRequiredService<MouseAutomationService>();
+                var keyboardAutomation = serviceProvider.GetRequiredService<KeyboardAutomationService>();
+                var windowManagement = serviceProvider.GetRequiredService<WindowManagementService>();
+                var accessibility = serviceProvider.GetRequiredService<AccessibilityService>();
+                return new AionRemoteControlService(screenCapture, ocr, voiceRecognition, voiceSynthesis,
+                    mouseAutomation, keyboardAutomation, windowManagement, accessibility);
+            });
+
             services.AddSingleton<MainWindow>();
 
             Log.Information("✅ All services registered in DI container");

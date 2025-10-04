@@ -19,9 +19,11 @@ namespace AionDesktopAssistant
         private readonly WindowManagementService _windowManagement;
         private readonly AccessibilityService _accessibility;
         private readonly ClaudeCodeIntegrationService _claudeCode;
+        private readonly AionRemoteControlService _remoteControl;
 
         private bool _isListening = false;
         private bool _claudeIntegrationEnabled = false;
+        private bool _remoteControlEnabled = false;
 
         public MainWindow(
             ScreenCaptureService screenCapture,
@@ -32,7 +34,8 @@ namespace AionDesktopAssistant
             KeyboardAutomationService keyboardAutomation,
             WindowManagementService windowManagement,
             AccessibilityService accessibility,
-            ClaudeCodeIntegrationService claudeCode)
+            ClaudeCodeIntegrationService claudeCode,
+            AionRemoteControlService remoteControl)
         {
             InitializeComponent();
 
@@ -45,6 +48,7 @@ namespace AionDesktopAssistant
             _windowManagement = windowManagement;
             _accessibility = accessibility;
             _claudeCode = claudeCode;
+            _remoteControl = remoteControl;
 
             InitializeServices();
         }
@@ -65,6 +69,17 @@ namespace AionDesktopAssistant
                 else
                 {
                     AddToOutput("⚠️ Claude Code integration not available");
+                }
+
+                // 🔄 Initialize Remote Control Server (for Claude to control AION)
+                _remoteControlEnabled = await _remoteControl.StartServerAsync();
+                if (_remoteControlEnabled)
+                {
+                    AddToOutput("🔄 Remote Control Server started - Claude can now control AION at http://localhost:8080");
+                }
+                else
+                {
+                    AddToOutput("⚠️ Remote Control Server failed to start");
                 }
 
                 AddToOutput("✅ AION Desktop Assistant initialized successfully");
