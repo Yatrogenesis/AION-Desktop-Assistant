@@ -1,0 +1,255 @@
+name: 🚀 CI/CD Complete Pipeline
+
+on:
+  push:
+    branches: [ main, develop, add-release-workflow ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_NAME: AionDesktopAssistant
+
+jobs:
+  # 🧪 Testing
+  test:
+    name: 🧪 Tests & Coverage
+    runs-on: windows-latest
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Restore
+      run: dotnet restore
+
+    - name: 🔨 Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: 🧪 Test
+      run: dotnet test --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --logger "trx"
+
+    - name: 📊 Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: '**/coverage.cobertura.xml'
+        fail_ci_if_error: false
+
+    - name: 📤 Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/*.trx'
+
+  # 🎨 Quality
+  quality:
+    name: 🎨 Code Quality & Linting
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🎨 Emoji Commit Check
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        if [[ ! $COMMIT_MSG =~ ^(✨|🐛|📝|🔧|⚡|♻️|🚀|🔥|💚|👷|📦|⬆️|⬇️|🔒|🎨|🤖|🔄) ]]; then
+          echo "⚠️ Warning: Commit should start with an emoji"
+        else
+          echo "✅ Commit follows emoji conventions"
+        fi
+
+    - name: 📊 Analyze .NET Code
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🔍 Code Analysis
+      run: |
+        dotnet restore
+        dotnet build --configuration Release /p:EnableNETAnalyzers=true /p:AnalysisLevel=latest
+
+  # 🏗️ Build Multi-Platform
+  build:
+    name: 🏗️ Build ${{ matrix.name }}
+    needs: [test, quality]
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            runtime: win-x64
+            name: Windows-x64
+          - os: windows-latest
+            runtime: win-arm64
+            name: Windows-ARM64
+          - os: ubuntu-latest
+            runtime: linux-x64
+            name: Linux-x64
+          - os: macos-latest
+            runtime: osx-x64
+            name: macOS-x64
+          - os: macos-latest
+            runtime: osx-arm64
+            name: macOS-ARM64
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Publish
+      run: |
+        dotnet publish --configuration Release \
+          --runtime ${{ matrix.runtime }} \
+          --self-contained true \
+          --output ./publish \
+          /p:PublishSingleFile=true \
+          /p:PublishTrimmed=true \
+          /p:IncludeNativeLibrariesForSelfExtract=true
+
+    - name: 📤 Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PROJECT_NAME }}-${{ matrix.name }}
+        path: ./publish/*
+        retention-days: 30
+
+  # 📦 Create Release
+  release:
+    name: 🚀 Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 📥 Download All Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+
+    - name: 📦 Create ZIP Packages
+      run: |
+        cd artifacts
+        for dir in */; do
+          zip -r "${dir%/}.zip" "$dir"
+        done
+
+    - name: 🔐 Generate Checksums
+      run: |
+        cd artifacts
+        sha256sum *.zip > checksums.txt
+
+    - name: 📝 Generate Release Notes
+      id: notes
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/}
+        cat > notes.md << EOF
+        ## 🎉 AION Desktop Assistant $VERSION
+
+        ### ✨ Features
+        - 🤖 Claude Code AI integration
+        - 🔄 Bidirectional control
+        - 🎤 Voice recognition & synthesis
+        - 👁️ OCR screen reading
+        - 🖱️ Mouse & keyboard automation
+        - ♿ Accessibility-first design
+
+        ### 📦 Downloads
+        **Windows:** x64, ARM64
+        **Linux:** x64
+        **macOS:** x64, ARM64 (Apple Silicon)
+
+        ### 🚀 Quick Start
+        1. Download for your platform
+        2. Extract ZIP
+        3. Run executable
+        4. Configure voice settings
+        5. Start using!
+
+        ---
+        🚀 Generated with Claude Code
+        EOF
+
+    - name: 🚀 Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: 🎉 ${{ github.ref_name }}
+        body_path: notes.md
+        files: |
+          artifacts/*.zip
+          artifacts/checksums.txt
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  # 📚 Deploy Docs
+  docs:
+    name: 📚 GitHub Pages
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🔨 Build Docs Site
+      run: |
+        mkdir -p docs-site
+        cp *.md docs-site/
+        cp version.json docs-site/
+
+        cat > docs-site/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>🤖 AION Desktop Assistant</title>
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown.min.css">
+          <style>
+            body { max-width: 980px; margin: 50px auto; padding: 20px; background: #0d1117; }
+            .markdown-body { background: transparent; color: #c9d1d9; }
+          </style>
+        </head>
+        <body class="markdown-body">
+          <div id="content"></div>
+          <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+          <script>
+            fetch('README.md')
+              .then(r => r.text())
+              .then(t => document.getElementById('content').innerHTML = marked.parse(t));
+          </script>
+        </body>
+        </html>
+        EOF
+
+    - name: 🚀 Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs-site
+        cname: aion.yourdomain.com
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: '📚 docs: Deploy documentation'

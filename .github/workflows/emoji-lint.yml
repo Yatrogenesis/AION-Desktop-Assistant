@@ -1,0 +1,114 @@
+name: 🎨 Emoji Linter
+
+on:
+  push:
+    branches: [ main, develop, add-release-workflow ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  emoji-lint:
+    name: 🎨 Validate Emoji Standards
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🎨 Check Commit Message Emojis
+      run: |
+        echo "🔍 Validating commit message emojis..."
+
+        VALID_EMOJIS="✨|🐛|📝|🔧|⚡|♻️|🚀|🔥|💚|👷|📦|⬆️|⬇️|🔒|🎨|🤖|🔄|🚑|🩹|📚|💡|🔨|📌|✅|🧪|🚨|🧹|🚚|🔖|📈|🔗|📡|🔀|⏪|🚧|🏗️|🗃️|💄|🔊|🔇|♿|🌐"
+
+        for commit in $(git rev-list origin/${{ github.base_ref || 'main' }}..${{ github.sha }}); do
+          MSG=$(git log -1 --pretty=%B $commit)
+          FIRST_CHAR=$(echo "$MSG" | head -c 2)
+
+          if ! echo "$MSG" | grep -qE "^($VALID_EMOJIS)"; then
+            echo "❌ Commit $commit does not start with a valid emoji!"
+            echo "Message: $MSG"
+            echo ""
+            echo "See .github/COMMIT_CONVENTION.md for valid emojis"
+            exit 1
+          else
+            echo "✅ Commit $commit: Valid emoji"
+          fi
+        done
+
+        echo "✅ All commits follow emoji conventions!"
+
+    - name: 🎨 Check C# Files for Emoji Logging
+      run: |
+        echo "🔍 Checking C# files for emoji logging..."
+
+        MISSING_EMOJIS=0
+
+        find . -name "*.cs" -type f ! -path "*/bin/*" ! -path "*/obj/*" | while read file; do
+          if grep -q "_logger\." "$file"; then
+            if ! grep -qE "🚀|✅|❌|⚠️|🔧|📊|💥|🗑️|🎯|👂|📝|🔍|💬|🎤|🔊|👁️|🖱️|⌨️|🪟|♿|🤖|🔄" "$file"; then
+              echo "⚠️ $file has logging but no emojis"
+              MISSING_EMOJIS=$((MISSING_EMOJIS + 1))
+            fi
+          fi
+        done
+
+        if [ $MISSING_EMOJIS -gt 0 ]; then
+          echo "⚠️ Warning: $MISSING_EMOJIS files have logging without emojis"
+          echo "Consider adding emojis for better log readability"
+        else
+          echo "✅ All C# files with logging use emojis!"
+        fi
+
+    - name: 📝 Check Markdown Files for Emojis
+      run: |
+        echo "🔍 Checking Markdown files for emojis..."
+
+        MD_FILES=$(find . -name "*.md" ! -path "*/node_modules/*" ! -path "*/.git/*")
+
+        for file in $MD_FILES; do
+          if ! grep -qE "✨|📋|🚀|✅|🎯|📦|🔧|💡|🤖|🔄|📚" "$file"; then
+            echo "💡 Suggestion: $file could benefit from emojis"
+          else
+            echo "✅ $file uses emojis"
+          fi
+        done
+
+    - name: 🔍 Check README Badges
+      run: |
+        echo "🔍 Validating README badges..."
+
+        if ! grep -q "!\[.*\](https://img.shields.io" README.md; then
+          echo "⚠️ README.md missing badges"
+        else
+          echo "✅ README.md has badges"
+        fi
+
+    - name: 📊 Generate Emoji Report
+      run: |
+        echo "📊 Emoji Usage Report"
+        echo "===================="
+        echo ""
+
+        echo "Commits by emoji:"
+        git log --all --pretty=format:"%s" | grep -oE "^(✨|🐛|📝|🔧|⚡|♻️|🚀|🔥|💚|👷|📦|⬆️|⬇️|🔒|🎨|🤖|🔄)" | sort | uniq -c | sort -rn
+
+        echo ""
+        echo "Files with emoji logging:"
+        find . -name "*.cs" -type f ! -path "*/bin/*" ! -path "*/obj/*" | while read file; do
+          if grep -qE "🚀|✅|❌|⚠️|🔧|📊|💥" "$file"; then
+            echo "✅ $(basename $file)"
+          fi
+        done | wc -l
+
+    - name: ✅ Summary
+      run: |
+        echo "✅ Emoji linting complete!"
+        echo ""
+        echo "Standards validated:"
+        echo "- ✅ Commit message emojis"
+        echo "- ✅ C# logging emojis"
+        echo "- ✅ Markdown documentation emojis"
+        echo "- ✅ README badges"
