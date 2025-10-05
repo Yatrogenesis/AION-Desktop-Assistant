@@ -1,0 +1,77 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Build artifacts
+target/
+aion-server-rust/target/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Tests
+tests/__pycache__/
+tests/.pytest_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Documentation
+*.md
+docs/
+TESTING.md
+TEST-SUMMARY.md
+AUDIT-REPORT.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Installers
+installers/
+*.iss
+*.nsi
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.Python
+venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# macOS
+.DS_Store
+._*
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+build.log
+
+# Temporary
+*.tmp
+*.temp
+*.bak
+*.cache

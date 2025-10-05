@@ -1,0 +1,113 @@
+version: '3.9'
+
+# AION Desktop Assistant - Docker Compose Configuration
+# Version: 1.1.0
+
+services:
+  # Main AION Server
+  aion-server:
+    image: aion-desktop-assistant:latest
+    container_name: aion-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VERSION=1.1.0
+    ports:
+      - "8080:8080"
+    environment:
+      - RUST_LOG=info
+      - RUST_BACKTRACE=1
+    volumes:
+      - aion-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/status"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - aion-network
+    labels:
+      - "com.aion.service=server"
+      - "com.aion.version=1.1.0"
+
+  # Prometheus (monitoring - optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: aion-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    networks:
+      - aion-network
+    profiles:
+      - monitoring
+
+  # Grafana (visualization - optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: aion-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    restart: unless-stopped
+    networks:
+      - aion-network
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: aion-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    restart: unless-stopped
+    networks:
+      - aion-network
+    profiles:
+      - proxy
+    depends_on:
+      - aion-server
+
+networks:
+  aion-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  aion-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# Usage:
+# Basic: docker-compose up -d
+# With monitoring: docker-compose --profile monitoring up -d
+# With proxy: docker-compose --profile proxy up -d
+# All services: docker-compose --profile monitoring --profile proxy up -d
+# Stop: docker-compose down
+# Rebuild: docker-compose up -d --build
