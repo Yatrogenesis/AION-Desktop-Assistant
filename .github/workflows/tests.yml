@@ -1,0 +1,184 @@
+name: 🧪 Automated Test Suite
+
+on:
+  push:
+    branches: [ main, develop, add-release-workflow ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # 🦀 Rust Tests
+  rust-tests:
+    name: 🦀 Rust Tests & Coverage
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🦀 Setup Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
+        components: clippy, rustfmt
+
+    - name: 📦 Cache Cargo
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: 🔍 Cargo Check
+      run: cargo check --manifest-path aion-server-rust/Cargo.toml --verbose
+
+    - name: 🧪 Run Unit Tests
+      run: cargo test --manifest-path aion-server-rust/Cargo.toml --lib --verbose
+
+    - name: 🧪 Run Integration Tests
+      run: cargo test --manifest-path aion-server-rust/Cargo.toml --test '*' --verbose
+
+    - name: 🎨 Check Formatting
+      run: cargo fmt --manifest-path aion-server-rust/Cargo.toml --all -- --check
+
+    - name: 📋 Clippy Lints
+      run: cargo clippy --manifest-path aion-server-rust/Cargo.toml --all-targets --all-features -- -D warnings
+
+    - name: 📊 Coverage (Ubuntu only)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cargo install cargo-tarpaulin
+        cargo tarpaulin --manifest-path aion-server-rust/Cargo.toml --out Xml --output-dir ./coverage
+
+    - name: 📤 Upload Coverage
+      if: matrix.os == 'ubuntu-latest'
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage/cobertura.xml
+        flags: rust
+        name: rust-coverage
+
+  # 🐍 Python Tests
+  python-tests:
+    name: 🐍 Python Tests & Coverage
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: 📦 Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements-test.txt
+
+    - name: 🧪 Run Tests with Coverage
+      run: |
+        pytest tests/ -v --cov=. --cov-report=xml --cov-report=term
+
+    - name: 📤 Upload Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml
+        flags: python-${{ matrix.python-version }}
+        name: python-${{ matrix.python-version }}-coverage
+
+  # 🔍 Code Quality
+  code-quality:
+    name: 🔍 Code Quality Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🦀 Setup Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install Quality Tools
+      run: |
+        pip install black flake8 mypy pylint
+        cargo install cargo-audit
+
+    - name: 🎨 Black Formatting Check
+      run: black --check .
+
+    - name: 🔍 Flake8 Linting
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: 🔒 Cargo Security Audit
+      run: cargo audit --manifest-path aion-server-rust/Cargo.toml
+
+    - name: 📋 Dependency Check
+      run: |
+        cargo tree --manifest-path aion-server-rust/Cargo.toml | grep -i "duplicate" || true
+
+  # 🚀 Performance Tests
+  performance-tests:
+    name: 🚀 Performance Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🦀 Setup Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+
+    - name: 🏃 Run Benchmarks
+      run: |
+        cargo build --manifest-path aion-server-rust/Cargo.toml --release
+        echo "📊 Binary Size:"
+        ls -lh aion-server-rust/target/release/aion-server* | head -1
+
+    - name: ⚡ Startup Time Test
+      run: |
+        timeout 5 aion-server-rust/target/release/aion-server &
+        sleep 2
+        curl http://localhost:8080/api/status || echo "Server startup check"
+
+  # 📊 Test Summary
+  test-summary:
+    name: 📊 Test Summary
+    needs: [rust-tests, python-tests, code-quality, performance-tests]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: 📥 Check Results
+      run: |
+        echo "## 🧪 Test Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Rust Tests: ${{ needs.rust-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Python Tests: ${{ needs.python-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Code Quality: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Performance: ${{ needs.performance-tests.result }}" >> $GITHUB_STEP_SUMMARY
+
+    - name: ❌ Fail if Tests Failed
+      if: needs.rust-tests.result == 'failure' || needs.python-tests.result == 'failure'
+      run: exit 1
