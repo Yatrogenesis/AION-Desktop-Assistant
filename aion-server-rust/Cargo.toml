@@ -1,0 +1,23 @@
+[package]
+name = "aion-server"
+version = "1.1.0"
+edition = "2021"
+authors = ["AION Technologies"]
+description = "AION Desktop Assistant - High-performance HTTP control server"
+
+[dependencies]
+actix-web = "4.9"
+actix-rt = "2.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.41", features = ["full"] }
+enigo = "0.2"
+chrono = "0.4"
+log = "0.4"
+env_logger = "0.11"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

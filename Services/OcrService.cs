@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Threading.Tasks;
 using Tesseract;
 using OpenCvSharp;
-using OpenCvSharp.Extensions;
 using System.IO;
 using Serilog;
 using System.Diagnostics;

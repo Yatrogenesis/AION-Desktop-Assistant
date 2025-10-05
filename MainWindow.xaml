@@ -61,7 +61,7 @@
 
             <!-- Output Panel -->
             <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                <TextBlock Text="Output & Feedback" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock Text="Output &amp; Feedback" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
                 <ScrollViewer Height="400" VerticalScrollBarVisibility="Auto">
                     <TextBox x:Name="OutputTextBox"
                              TextWrapping="Wrap"

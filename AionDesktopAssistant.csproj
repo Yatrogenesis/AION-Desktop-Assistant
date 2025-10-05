@@ -45,17 +45,4 @@
     <Reference Include="UIAutomationTypes" />
   </ItemGroup>
 
-  <!-- Native Windows APIs for accessibility -->
-  <ItemGroup>
-    <COMReference Include="SpeechLib">
-      <Guid>{c866ca3a-32f7-11d2-9602-00c04f8ee628}</Guid>
-      <VersionMajor>5</VersionMajor>
-      <VersionMinor>4</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-
 </Project>

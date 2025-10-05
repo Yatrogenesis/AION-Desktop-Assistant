@@ -72,7 +72,7 @@ namespace AionDesktopAssistant.Services
             public int Bottom;
         }
 
-        private class WindowInfo
+        public class WindowInfo
         {
             public IntPtr Handle { get; set; }
             public string Title { get; set; } = string.Empty;

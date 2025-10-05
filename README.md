@@ -2,16 +2,26 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
-![License](https://img.shields.io/badge/license-Proprietary-red.svg)
-![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?style=for-the-badge)
+![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg?style=for-the-badge&logo=.net)
+![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue.svg?style=for-the-badge)
 
-**AI-Powered Windows Desktop Accessibility Assistant**
+![Build](https://github.com/Yatrogenesis/AION-Desktop-Assistant/workflows/🚀%20CI/CD%20Complete%20Pipeline/badge.svg)
+![Tests](https://github.com/Yatrogenesis/AION-Desktop-Assistant/workflows/🧪%20Tests/badge.svg)
+![Emoji Lint](https://github.com/Yatrogenesis/AION-Desktop-Assistant/workflows/🎨%20Emoji%20Linter/badge.svg)
+![Code Coverage](https://codecov.io/gh/Yatrogenesis/AION-Desktop-Assistant/branch/main/graph/badge.svg)
+
+![GitHub stars](https://img.shields.io/github/stars/Yatrogenesis/AION-Desktop-Assistant?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Yatrogenesis/AION-Desktop-Assistant?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Yatrogenesis/AION-Desktop-Assistant)
+![GitHub release](https://img.shields.io/github/v/release/Yatrogenesis/AION-Desktop-Assistant)
+
+**AI-Powered Multi-Platform Accessibility Assistant**
 
 *Empowering independence through voice control, screen reading, and AI assistance*
 
-[Features](#-features) • [Installation](#-installation--setup) • [Voice Commands](#-voice-commands) • [Claude Integration](#-claude-code-integration)
+[Features](#-features) • [Installation](#-installation--setup) • [Voice Commands](#-voice-commands) • [Claude Integration](#-claude-code-integration) • [Documentation](https://yatrogenesis.github.io/AION-Desktop-Assistant/)
 
 </div>
 
